@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C1 Vocabulary — Multiple Choice</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 850px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  h1 {
+    color: #1a3a5c;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 12px;
+    font-size: 1.6em;
+    margin-top: 0;
+    text-align: center;
+  }
+  .instructions {
+    background: #eaf4fc;
+    padding: 14px 18px;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+    text-align: center;
+  }
+
+  .score-board {
+    text-align: center;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    font-weight: bold;
+    color: #27ae60;
+  }
+
+  /* Question Card */
+  .question-card {
+    background: #fdfdfd;
+    border: 1px solid #e0e6ed;
+    border-left: 5px solid #3498db;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 18px;
+    transition: all 0.3s ease;
+  }
+  .question-card.answered {
+    opacity: 0.9;
+  }
+  .question-text {
+    font-size: 1.05em;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 120px;
+    border-bottom: 2px solid #3498db;
+    text-align: center;
+    color: #3498db;
+    font-weight: bold;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    padding: 12px 16px;
+    border: 2px solid #dfe6e9;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95em;
+    background: #fff;
+  }
+  .option:hover:not(.disabled) {
+    border-color: #3498db;
+    background: #f0f8ff;
+  }
+  .option.correct {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+    font-weight: 600;
+  }
+  .option.incorrect {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+  }
+  .option.disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  /* Hint */
+  .hint-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    color: #856404;
+    font-size: 0.95em;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .hint-box.show {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint-icon {
+    font-size: 1.2em;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Controls */
+  .controls {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+  }
+  .btn-reset {
+    padding: 12px 28px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+  .btn-reset:hover {
+    background: #c0392b;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>C1 Vocabulary — Multiple Choice</h1>
+  
+  <div class="instructions">
+    Choose the correct phrase to complete each sentence. If you make a mistake, a hint with the Russian translation will appear.
+  </div>
+
+  <div class="score-board">
+    Score: <span id="score">0</span> / 16
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="controls">
+    <button class="btn-reset" onclick="resetQuiz()">↺ Reset Quiz</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      id: 1,
+      text: "Over the last five years, scientists have managed to ________ treating chronic diseases thanks to new gene therapy techniques.",
+      options: ["make strides in", "make the point", "change tack"],
+      correct: "make strides in",
+      hint: "добиваться значительных успехов в"
+    },
+    {
+      id: 2,
+      text: "The doctor warned the patient that ignoring early symptoms of diabetes could lead to ________ such as kidney failure or blindness.",
+      options: ["dire consequences", "trite phrases", "spot on ideas"],
+      correct: "dire consequences",
+      hint: "катастрофические / тяжёлые последствия"
+    },
+    {
+      id: 3,
+      text: "The idea that vitamin supplements can completely replace a balanced diet is a ________; nutritionists strongly disagree with this view.",
+      options: ["sweeping statement", "complete fallacy", "vacuous comment"],
+      correct: "complete fallacy",
+      hint: "полное заблуждение"
+    },
+    {
+      id: 4,
+      text: "To claim that this new herbal remedy can cure cancer ________ — there is no scientific evidence to support such a statement.",
+      options: ["is patently not true", "strikes a chord", "is too oversimplistic"],
+      correct: "is patently not true",
+      hint: "явно не соответствует действительности"
+    },
+    {
+      id: 5,
+      text: "Child psychologists advise parents not to ________ their children's mistakes, but rather to help them learn from these experiences.",
+      options: ["trot out trite phrases", "dwell on", "make strides in"],
+      correct: "dwell on",
+      hint: "зацикливаться на, постоянно возвращаться к"
+    },
+    {
+      id: 6,
+      text: "Some parents feel that social media platforms deliberately ________ young users into sharing personal information without fully understanding the risks.",
+      options: ["entrap", "dwell on", "strike a chord with"],
+      correct: "entrap",
+      hint: "заманивать кого-л. в ловушку (entrap sb)"
+    },
+    {
+      id: 7,
+      text: "Many educators agree that children learn best through play — ________ that early childhood should not be filled with rigid academic drills.",
+      options: ["an element of truth", "the idea is spot on", "sweeping statements"],
+      correct: "the idea is spot on",
+      hint: "мысль абсолютно верна / идея точна"
+    },
+    {
+      id: 8,
+      text: "After years of failed recycling campaigns, the city council decided to ________ and focus on reducing plastic production at the source.",
+      options: ["change tack", "make strides in", "dwell on"],
+      correct: "change tack",
+      hint: "изменить тактику / курс"
+    },
+    {
+      id: 9,
+      text: "At the environmental conference, the speaker offered nothing but ________ about 'a greener future' without proposing any concrete actions.",
+      options: ["sweeping statements", "vacuous comments", "complete fallacies"],
+      correct: "vacuous comments",
+      hint: "пустые / бессодержательные комментарии"
+    },
+    {
+      id: 10,
+      text: "It is unfair to make ________ that all factories are equally responsible for air pollution without examining their actual emissions data.",
+      options: ["vacuous comments", "sweeping statements", "trite phrases"],
+      correct: "sweeping statements",
+      hint: "обобщённые / голословные заявления"
+    },
+    {
+      id: 11,
+      text: "Her apology sounded sincere on the surface, but it didn't really ________ — he could sense she was just saying what he wanted to hear.",
+      options: ["ring true", "be too oversimplistic", "trot out trite phrases"],
+      correct: "ring true",
+      hint: "звучать правдоподобно"
+    },
+    {
+      id: 12,
+      text: "The poem about long-distance love really ________ many couples who struggle to maintain their connection while living in different cities.",
+      options: ["makes strides in", "strikes a chord with", "entails dire consequences"],
+      correct: "strikes a chord with",
+      hint: "находит отклик у"
+    },
+    {
+      id: 13,
+      text: "Although their argument seemed exaggerated, there was certainly ________ to the claim that they had been growing apart over the years.",
+      options: ["an element of truth", "a complete fallacy", "a dire consequence"],
+      correct: "an element of truth",
+      hint: "доля правды"
+    },
+    {
+      id: 14,
+      text: "During their disagreement, he kept ________ like 'time heals everything' instead of actually addressing the real issue between them.",
+      options: ["dwell on", "trot out trite phrases", "make strides in"],
+      correct: "trot out trite phrases",
+      hint: "выдавать избитые / заезженные фразы"
+    },
+    {
+      id: 15,
+      text: "The teacher used a vivid real-life example to ________ that grammar rules are not just abstract ideas, but tools for clearer communication.",
+      options: ["make the point", "change tack", "entrap"],
+      correct: "make the point",
+      hint: "высказывать мысль, подчёркивать"
+    },
+    {
+      id: 16,
+      text: "Suggesting that all students learn in exactly the same way is ________ — every classroom contains individuals with different needs and styles.",
+      options: ["patently not true", "too oversimplistic", "striking a chord"],
+      correct: "too oversimplistic",
+      hint: "быть слишком упрощённым"
+    }
+  ];
+
+  let score = 0;
+  const quizContainer = document.getElementById('quizContainer');
+  const scoreDisplay = document.getElementById('score');
+
+  function renderQuiz() {
+    quizContainer.innerHTML = '';
+    questions.forEach((q, index) => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.id = `card-${index}`;
+
+      const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+      let optionsHTML = '';
+      shuffledOptions.forEach(opt => {
+        optionsHTML += `<div class="option" onclick="checkAnswer(this, ${index}, '${opt.replace(/'/g, "\\'")}')">${opt}</div>`;
+      });
+
+      card.innerHTML = `
+        <div class="question-text">${index + 1}. ${q.text.replace('________', '<span class="blank" id="blank-'+index+'">________</span>')}</div>
+        <div class="options" id="options-${index}">
+          ${optionsHTML}
+        </div>
+        <div class="hint-box" id="hint-${index}">
+          <span class="hint-icon">💡</span>
+          <span>Правильный ответ: <em>${q.hint}</em></span>
+        </div>
+      `;
+      quizContainer.appendChild(card);
+    });
+  }
+
+  function checkAnswer(element, qIndex, selectedOption) {
+    const q = questions[qIndex];
+    const card = document.getElementById(`card-${qIndex}`);
+    const optionsDiv = document.getElementById(`options-${qIndex}`);
+    const hintBox = document.getElementById(`hint-${qIndex}`);
+    const blank = document.getElementById(`blank-${qIndex}`);
+
+    if (card.classList.contains('answered')) return;
+
+    card.classList.add('answered');
+    const allOptions = optionsDiv.querySelectorAll('.option');
+    allOptions.forEach(opt => opt.classList.add('disabled'));
+
+    if (selectedOption === q.correct) {
+      element.classList.add('correct');
+      blank.textContent = selectedOption;
+      blank.style.color = '#155724';
+      blank.style.borderColor = '#28a745';
+      score++;
+      scoreDisplay.textContent = score;
+    } else {
+      element.classList.add('incorrect');
+      allOptions.forEach(opt => {
+        if (opt.textContent === q.correct) {
+          opt.classList.add('correct');
+        }
+      });
+      blank.textContent = q.correct;
+      blank.style.color = '#721c24';
+      blank.style.borderColor = '#dc3545';
+      hintBox.classList.add('show');
+    }
+  }
+
+  function resetQuiz() {
+    score = 0;
+    scoreDisplay.textContent = score;
+    renderQuiz();
+  }
+
+  renderQuiz();
+</script>
+
+</body>
+</html>
